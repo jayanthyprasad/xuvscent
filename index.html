@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mist Car Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #121212; color: white; }
+        button { width: 100%; padding: 20px; margin: 10px 0; font-size: 1.2rem; cursor: pointer; border-radius: 10px; border: none; }
+        .connect { background: #007bff; color: white; }
+        .action { background: #28a745; color: white; display: none; }
+    </style>
+</head>
+<body>
+    <h2>Mist Car BLE</h2>
+    <button class="connect" onclick="connectBLE()">1. Connect to Device</button>
+    <button class="action" onclick="sendCommand('START')">Power (Long Press)</button>
+    <button class="action" onclick="sendCommand('LEVEL')">Level (Short Click)</button>
+
+    <script>
+        let charac;
+        async function connectBLE() {
+            const device = await navigator.bluetooth.requestDevice({
+                filters: [{ name: 'xuv-scent' }],
+                optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b']
+            });
+            const server = await device.gatt.connect();
+            const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+            charac = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
+            document.querySelectorAll('.action').forEach(b => b.style.display = 'block');
+            document.querySelector('.connect').style.display = 'none';
+        }
+
+        async function sendCommand(cmd) {
+            if (charac) {
+                await charac.writeValue(new TextEncoder().encode(cmd));
+            }
+        }
+    </script>
+</body>
+</html>
