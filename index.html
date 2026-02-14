@@ -21,30 +21,68 @@
     <h2>XUV IOT Setup</h2>
     <button class="connect" onclick="connectBLE()">Connect to Bluetooth Device</button>
     <div class="button-container">
-        <button class="connect" onclick="sendCommand('WIFI_ON')">START WIFI</button>
-        <button class="connect" onclick="sendCommand('WIFI_OFF')">STOP WIFI</button>
+        <button class="connect" id="wifi_on" onclick="sendCommand('WIFI_ON')">START WIFI</button>
+        <button class="connect" id="wifi_off" onclick="sendCommand('WIFI_OFF')">STOP WIFI</button>
     </div>    
     <button class="action" onclick="sendCommand('START')">Power ON</button>
     <button class="action" onclick="sendCommand('CHANGE_LEVEL')">Change Level</button>
     <button class="action" onclick="sendCommand('STOP')">Turn OFF</button>
 
     <script>
-        let charac;
+         let charac;
+
         async function connectBLE() {
-            const device = await navigator.bluetooth.requestDevice({
-                filters: [{ name: 'xuv-scent' }],
-                optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b']
-            });
-            const server = await device.gatt.connect();
-            const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
-            charac = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
-            document.querySelectorAll('.action').forEach(b => b.style.display = 'block');
-            document.querySelector('.connect').style.display = 'none';
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'xuv-scent' }],
+                    optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b']
+                });
+
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+                charac = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
+
+                // 1. Show action buttons
+                document.querySelectorAll('.action').forEach(b => b.style.display = 'block');
+                document.querySelector('.connect').style.display = 'none';
+
+                // 2. Setup Notifications
+                await charac.startNotifications();
+                charac.addEventListener('characteristicvaluechanged', (event) => {
+                    const value = new TextDecoder().decode(event.target.value);
+                    updateButtonUI(value);
+                });
+
+                // 3. READ INITIAL STATE (Optional but recommended)
+                // This ensures the buttons color correctly immediately on connect
+                const initialValue = await charac.readValue();
+                updateButtonUI(new TextDecoder().decode(initialValue));
+
+            } catch (error) {
+                console.error("Bluetooth Connection Failed:", error);
+            }
         }
 
         async function sendCommand(cmd) {
             if (charac) {
-                await charac.writeValue(new TextEncoder().encode(cmd));
+                try {
+                    await charac.writeValue(new TextEncoder().encode(cmd));
+                } catch (error) {
+                    console.error("Send Command Failed:", error);
+                }
+            }
+        }
+
+        function updateButtonUI(status) {
+            const wifi_on = document.getElementById('wifi_on');
+            const wifi_off = document.getElementById('wifi_off');             
+            // Note: Ensure your ESP32/BLE device sends exactly "ON" or "OFF"
+            if (status.trim() === "ON") {
+                wifi_on.style.background = "linear-gradient(145deg, #00ff00, #008000)"; // Green
+                wifi_off.style.background = "#555"; // Dimmed
+            } else if (status.trim() === "OFF") {
+                wifi_on.style.background = "#555"; // Dimmed
+                wifi_off.style.background = "linear-gradient(145deg, #d32f2f, #b71c1c)"; // Red
             }
         }
     </script>
