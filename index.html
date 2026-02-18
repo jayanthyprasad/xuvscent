@@ -9,24 +9,150 @@
         .connect { background: #007bff; color: white; }
         .action { background: #28a745; color: white; display: none; }
 
-        .button-container {
+        /* 1. Main Containers (Consolidated) */
+            .flex-center {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+            }
+
+            /* 2. Outer Button Rim (Metallic Effect) */
+            .bt-round {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(145deg, #e6e6e6, #999999);
+                box-shadow: inset 0 2px 5px rgba(255,255,255,0.8), 0 5px 15px rgba(0,0,0,0.3);
+                padding: 8px; /* Thickness of the metallic rim */
+                transition: transform 0.1s ease;
+            }
+
+            .bt-round:active {
+                transform: scale(0.95);
+                box-shadow: inset 2px 2px 5px rgba(0,0,0,0.4);
+            }
+
+            /* 3. Inner Button Core (Glossy Blue) */
+            .bt-inner {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background: radial-gradient(circle at 30% 30%, #4facfe 0%, #0082fc 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: inset 0 -4px 6px rgba(0,0,0,0.2);
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* The Glossy Shine Overlay */
+            .bt-inner::after {
+                content: '';
+                position: absolute;
+                top: 5%;
+                left: 15%;
+                width: 70%;
+                height: 40%;
+                background: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+                border-radius: 50% 50% 40% 40%;
+            }
+
+            /* 4. Icon & Animation */
+            .bt-round svg {
+                width: 65%;
+                height: 65%;
+                fill: white;
+                z-index: 1;
+                filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+            }
+
+            .bt-round2 svg {
+                width: 65%;
+                height: 65%;
+                fill: white;
+                z-index: 1;
+                filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+            }
+
+            .waves {
+                animation: pulse 1.5s infinite;
+                transform-origin: center;
+            }
+
+            @keyframes pulse {
+                0% { opacity: 0.3; transform: scale(0.9); }
+                50% { opacity: 1; transform: scale(1); }
+                100% { opacity: 0.3; transform: scale(0.9); }
+            }
+            
+            /* Icon Styling */
+            .bluetooth-icon {
+                width: 45px;
+                height: 45px;
+                fill: white;
+            }
+            .percentage {
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             display: flex;
-            justify-content: center; /* Centers horizontally */
-            align-items: center;     /* Centers vertically (if the container has height) */
-            gap: 10px;               /* Adds space between buttons */
-        }
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            }
     </style>
 </head>
 <body>
     <h2>XUV IOT Setup</h2>
-    <button class="connect" onclick="connectBLE()">Connect to Bluetooth Device</button>
-    <div class="button-container">
-        <button class="connect" id="wifi_on" onclick="sendCommand('WIFI_ON')">START WIFI</button>
-        <button class="connect" id="wifi_off" onclick="sendCommand('WIFI_OFF')">STOP WIFI</button>
-    </div>    
+    <div class="flex-center">
+        <button class="bt-round" onclick="connectBLE()" title="Connect to Bluetooth Device" id="bleConnect" aria-label="Connect to Bluetooth Device" hover="Connect to Bluetooth Device">
+                <div class="bt-inner">
+                    <svg class="bluetooth-icon" viewBox="0 0 24 24">
+                        <!-- Corrected Bluetooth Symbol -->
+                        <path d="M17.71,7.71L12,2h-1v7.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z" />
+                        <!-- Corrected Signal Waves (Positioned on the sides) -->
+                        <g class="waves">
+                            <!-- Left Waves -->
+                            <path d="M5.5,9.5c-0.8,0.8-1.3,1.8-1.3,3s0.5,2.2,1.3,3l1.1-1.1c-0.5-0.5-0.8-1.2-0.8-1.9s0.3-1.4,0.8-1.9L5.5,9.5z" />
+                            <!-- Right Waves -->
+                            <path d="M18.5,9.5l-1.1,1.1c0.5,0.5,0.8,1.2,0.8,1.9s-0.3,1.4-0.8,1.9l1.1,1.1c0.8-0.8,1.3-1.8,1.3-3S19.3,10.3,18.5,9.5z" />
+                        </g>
+                    </svg>
+                </div>
+        </button>
+       
+            
+    <div style="display: flex;" class="connect" id="wifi_on" onclick="sendCommand('WIFI_ON')"> <!-- Initially hidden, shown after connection -->
+        
+        <button class="bt-round" id="wifiButton" title="WiFi Status" aria-label="WiFi Status" style="display: flex;" hover="Toggle wifi ON/OFF">
+            <div class="bt-inner">
+                <!-- WiFi Icon Path -->
+                <svg viewBox="0 0 24 24">
+                    <path d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z" />
+                </svg>
+            </div>
+        </button>    
+    </div>   
+
     <button class="action" onclick="sendCommand('START')">Power ON</button>
     <button class="action" onclick="sendCommand('CHANGE_LEVEL')">Change Level</button>
     <button class="action" onclick="sendCommand('STOP')">Turn OFF</button>
+
+    
+ 
+
+  
+   
+    </div> 
+     
 
     <script>
          let charac;
@@ -44,7 +170,8 @@
 
                 // 1. Show action buttons
                 document.querySelectorAll('.action').forEach(b => b.style.display = 'block');
-                document.querySelector('.connect').style.display = 'none';
+                document.querySelector('#wifiButton').style.display = 'flex'; // Show the button container
+                // document.querySelector('#bleConnect').style.display = 'none';
 
                 // 2. Setup Notifications
                 await charac.startNotifications();
@@ -59,7 +186,7 @@
                 updateButtonUI(new TextDecoder().decode(initialValue));
 
             } catch (error) {
-                console.error("Bluetooth Connection Failed:", error);
+                console.log("Bluetooth Connection Failed:", error);
             }
         }
 
@@ -68,10 +195,31 @@
                 try {
                     await charac.writeValue(new TextEncoder().encode(cmd));
                 } catch (error) {
-                    console.error("Send Command Failed:", error);
+                    console.log("Send Command Failed:", error);
                 }
             }
         }
+        
+        async function updateHardwareStatus() {
+                try {
+                     const res = await fetch('http://192.168.1.12/batteryLevel');
+                    const data = await response.json(); // Map from C++: { "level": 15, "voltage": 3.4 }
+                    // const response = {"level": Math.floor(Math.random() * 100) + 1};
+                    // await fetch('/batLevel');
+                    console.log("Received data from hardware:", response);
+                    // const data =  response; // Data is the map from C++
+
+                    // Extract 'level' from your map and update the blue bar
+                    const bar = document.getElementById('percentageText');
+                    if (data.level !== undefined) {
+                    bar.innerText = data.level + "%";
+                    }
+                } catch (err) {
+                    console.error("Connection lost to hardware", err);
+                }
+                }
+// Update UI every 5 seconds
+setInterval(updateHardwareStatus, 5000);
 
         function updateButtonUI(status) {
             const wifi_on = document.getElementById('wifi_on');
@@ -84,7 +232,73 @@
                 wifi_on.style.background = "#555"; // Dimmed
                 wifi_off.style.background = "linear-gradient(145deg, #d32f2f, #b71c1c)"; // Red
             }
-        }
+        }          
+          function loadNetworks() {
+                fetch('/batteryLevel').then(response => response.json()).then(networks => {
+                     
+                });
+            }
+ 
     </script>
+    
+
+
+
+<div style="display: flex;">
+    <button class="bt-round" id="batteryButton">
+        <!-- We will target 'batteryFill' for the color and 'percentageText' for the number -->
+        <div class="bt-inner battery-fill" id="batteryFill" style="background: linear-gradient(to top, #0082fc 0%, #1a1a1a 0%);">
+            <div class="percentage">
+                <span id="percentageText">1%</span>
+                <svg viewBox="0 0 24 24" style="width: 40px; height: 25px;">
+                    <path d="M16,20H8V6H16M16.67,4H15V2H9V4H7.33A0.67,0.67 0 0,0 6.67,4.67V21.33A0.67,0.67 0 0,0 7.33,22H16.67A0.67,0.67 0 0,0 17.33,21.33V4.67A0.67,0.67 0 0,0 16.67,4Z" transform="rotate(90 12 12)""")/>>
+                </svg>
+            </div>
+        </div>
+    </button>    
+</div>
+
+
+
+
+
+
+
+
+
+
+<style>
+    
+      /* Style for the 'Water Level' fill effect */
+.battery-fill {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.5s ease; /* Smooth transition when level changes */
+}
+
+/* Ensure the gloss/shine overlay from your bt-inner still works */
+.battery-fill::after {
+    z-index: 2;
+}
+
+.percentage {
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.percentage svg {
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+}
+
+</style>
+                 
 </body>
 </html>
