@@ -6,7 +6,7 @@
     <style>
         body { font-family: sans-serif; text-align: center; padding: 20px; background: #121212; color: white; }
         button { width: 100%; padding: 20px; margin: 10px 0; font-size: 1.2rem; cursor: pointer; border-radius: 10px; border: none; }
-        .connect { background: #007bff; color: white; }
+        /* .connect { background: #007bff; color: white; } */
         .action { background: #28a745; color: white; display: none; }
 
         /* 1. Main Containers (Consolidated) */
@@ -43,7 +43,8 @@
                 width: 100%;
                 height: 100%;
                 border-radius: 50%;
-                background: radial-gradient(circle at 30% 30%, #4facfe 0%, #0082fc 100%);
+                /* background: radial-gradient(circle at 30% 30%, #4facfe 0%, #0082fc 100%); */
+                background:radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -72,24 +73,24 @@
                 z-index: 1;
                 filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
             }
-
-            .bt-round2 svg {
-                width: 65%;
-                height: 65%;
-                fill: white;
-                z-index: 1;
-                filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
-            }
-
             .waves {
                 animation: pulse 1.5s infinite;
                 transform-origin: center;
+            }  
+            .wave-inner {
+                animation: pulse 1.5s infinite;
+                opacity: 0.3;
+            }          
+            .wave-outer {
+                animation: pulse 1.5s infinite;
+                animation-delay: 0.3s; /* The outer wave pulses slightly after the inner one */
+                opacity: 0.1;
             }
 
             @keyframes pulse {
-                0% { opacity: 0.3; transform: scale(0.9); }
-                50% { opacity: 1; transform: scale(1); }
-                100% { opacity: 0.3; transform: scale(0.9); }
+                0% { opacity: 0.2; transform: scale(0.95); }
+                50% { opacity: 0.9; transform: scale(1); }
+                100% { opacity: 0.2; transform: scale(0.95); }
             }
             
             /* Icon Styling */
@@ -97,129 +98,387 @@
                 width: 45px;
                 height: 45px;
                 fill: white;
+            }            
+             /* Style for the 'Water Level' fill effect */
+            .battery-fill {
+                display: flex;
+                flex-direction: column;
+                background: linear-gradient(to top, #0082fc 0%, #7c7e80 0%);
+                justify-content: center;
+                align-items: center;
+                transition: background 0.7s ease; /* Smooth transition when level changes */
+            }
+
+            /* Ensure the gloss/shine overlay from your bt-inner still works */
+            .battery-fill::after {
+                z-index: 2;
             }
             .percentage {
-            font-size: 20px;
-            font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
+                z-index: 3;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                color: white;
+                font-weight: bold;
+                font-family: 'Segoe UI', sans-serif;
+                text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            }
+            .percentage svg {
+                filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+            }
+            /* When NOT connected (Searching) */
+            .bt-round:not(.connected) .waves path {
+                animation: pulse 1.5s infinite;
+            }
+
+            /* When CONNECTED (Steady Signal) */
+            .bt-round.connected .waves {
+                display: block !important; /* Ensure they stay visible */
+            }
+
+            .bt-round.connected .waves path {
+                animation: signal-glow 2s infinite alternate; /* Slower, steady glow */
+                /*fill: #0082fc;  Change waves to green to match the connected state */
+                opacity: 1;
+            }
+
+            /* New "Signal Locked" Animation */
+            @keyframes signal-glow {
+                from { filter: drop-shadow(0 0 2px #0082fc); opacity: 0.5; }
+                to { filter: drop-shadow(0 0 8px #0082fc); opacity: 1; }
+            }
+            /* Outer Container/Rim */
+                .btn-rim {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                    background: linear-gradient(145deg, #e6e6e6, #999999);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: inset 0 2px 5px rgba(255,255,255,0.8), 0 5px 15px rgba(0,0,0,0.3);
+                }
+
+            /* Inner Core */
+            .btn-core {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background: #7c7e80;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                /* box-shadow: inset 4px 4px 8px #1a1c1e, inset -4px -4px 8px #2c2f33; */
+            }
+
+            /* The Glowing Green Triangle */
+            .triangle-icon {
+                width: 50%;
+                fill: #0097fc; /* The minty green from your image */
+                filter: drop-shadow(0 0 5px rgba(93, 176, 253, 0.6));
+                transition: all 0.2s ease;
+            }
+
+            /* Animation Class (Triggered via JS) */
+            .intensity-pulse {
+                animation: triangle-flash 0.4s ease-out;
+            }
+
+            @keyframes triangle-flash {
+                0% { transform: scale(1); filter: drop-shadow(0 0 5px #5dfdc7); }
+                50% { transform: scale(1.2); filter: drop-shadow(0 0 20px #5dfdc7); fill: #fff; }
+                100% { transform: scale(1); filter: drop-shadow(0 0 5px #5dfdc7); }
+            }
+
+            .intensity-btn:active {
+                transform: scale(0.95);
+            }
+            .power-btn {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                border: none;
+                background: #1a1a1a;
+                padding: 8px; /* Thickness of the green ring */
+                cursor: pointer;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+                transition: transform 0.2s;
+            }
+
+            /* The Green Glowing Ring */
+            .power-rim {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                /* background: linear-gradient(145deg, #e6e6e6, #999999); */
+                box-shadow: inset 0 0 10px #000, 0 0 15px rgba(57, 255, 20, 0.4);
+                padding: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Inner Core - Dark Inset */
+            .power-core {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                /* background: radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%); */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                /* box-shadow: inset 2px 2px 10px #000; */
+            }
+
+            /* The Power Icon & Pulse Animation */
+            .power-icon {
+                width: 50%;
+                fill: #e0e0e0;
+                filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+                transition: fill 0.3s;
+            }
+
+            /* Pulsing state when "ON" */
+            .power-btn.on .power-icon {
+                fill: #0082fc;
+                animation: power-pulse 2s infinite;
+            }
+
+            @keyframes power-pulse {
+                0% { filter: drop-shadow(0 0 2px #0082fc); opacity: 0.7; }
+                50% { filter: drop-shadow(0 0 15px #0082fc); opacity: 1; }
+                100% { filter: drop-shadow(0 0 2px #0082fc); opacity: 0.7; }
+            }
+            .power-btn:active { transform: scale(0.95); }
+            .showItems{
+                display: none;
+                justify-content: center;
+                align-items: center;
             }
     </style>
 </head>
 <body>
     <h2>XUV IOT Setup</h2>
     <div class="flex-center">
-        <button class="bt-round" onclick="connectBLE()" title="Connect to Bluetooth Device" id="bleConnect" aria-label="Connect to Bluetooth Device" hover="Connect to Bluetooth Device">
-                <div class="bt-inner">
-                    <svg class="bluetooth-icon" viewBox="0 0 24 24">
-                        <!-- Corrected Bluetooth Symbol -->
-                        <path d="M17.71,7.71L12,2h-1v7.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z" />
-                        <!-- Corrected Signal Waves (Positioned on the sides) -->
-                        <g class="waves">
-                            <!-- Left Waves -->
-                            <path d="M5.5,9.5c-0.8,0.8-1.3,1.8-1.3,3s0.5,2.2,1.3,3l1.1-1.1c-0.5-0.5-0.8-1.2-0.8-1.9s0.3-1.4,0.8-1.9L5.5,9.5z" />
-                            <!-- Right Waves -->
-                            <path d="M18.5,9.5l-1.1,1.1c0.5,0.5,0.8,1.2,0.8,1.9s-0.3,1.4-0.8,1.9l1.1,1.1c0.8-0.8,1.3-1.8,1.3-3S19.3,10.3,18.5,9.5z" />
-                        </g>
-                    </svg>
-                </div>
-        </button>
-       
-            
-    <div style="display: flex;" class="connect" id="wifi_on" onclick="sendCommand('WIFI_ON')"> <!-- Initially hidden, shown after connection -->
         
-        <button class="bt-round" id="wifiButton" title="WiFi Status" aria-label="WiFi Status" style="display: flex;" hover="Toggle wifi ON/OFF">
-            <div class="bt-inner">
-                <!-- WiFi Icon Path -->
-                <svg viewBox="0 0 24 24">
-                    <path d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z" />
-                </svg>
-            </div>
-        </button>    
-    </div>   
-
-    <button class="action" onclick="sendCommand('START')">Power ON</button>
-    <button class="action" onclick="sendCommand('CHANGE_LEVEL')">Change Level</button>
-    <button class="action" onclick="sendCommand('STOP')">Turn OFF</button>
-
+    <table>
+        <tr>
+            <td>  </td>
+            <td>  
+                <div class="showItems">
+                    <button class="bt-round" id="batteryButton">
+                        <!-- We will target 'batteryFill' for the color and 'percentageText' for the number -->
+                        <div class="bt-inner battery-fill" id="batteryFill" title="Battery Level" aria-label="Battery Level"
+                            hover="Battery Level">
+                            <div class="percentage">
+                                <span id="percentageText">--%</span>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </td>
+            <td>   </td>
+        </tr>
+        <tr>
+            <td>
+                <button class="bt-round" onclick="connectBLE()" title="Connect to Bluetooth Device" id="bleConnect"
+                    aria-label="Connect to Bluetooth Device" hover="Connect to Bluetooth Device">
+                    <div class="bt-inner">
+                        <svg class="bluetooth-icon" viewBox="0 0 24 24">
+                            <!-- Corrected Bluetooth Symbol -->
+                            <path
+                                d="M17.71,7.71L12,2h-1v7.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z" />
+                            <!-- Corrected Signal Waves (Positioned on the sides) -->
+                            <g class="waves">
+                                <!-- Left Waves (Outer & Inner) -->
+                                <path class="wave-outer"
+                                    d="M3.5,8.5c-1.1,1.1-1.8,2.6-1.8,4.2s0.7,3.1,1.8,4.2l1.1-1.1c-0.8-0.8-1.3-1.9-1.3-3.1s0.5-2.3,1.3-3.1L3.5,8.5z" />
+                                <path class="wave-inner"
+                                    d="M5.5,9.5c-0.8,0.8-1.3,1.8-1.3,3s0.5,2.2,1.3,3l1.1-1.1c-0.5-0.5-0.8-1.2-0.8-1.9s0.3-1.4,0.8-1.9L5.5,9.5z" />
     
- 
-
+                                <!-- Right Waves (Inner & Outer) -->
+                                <path class="wave-inner"
+                                    d="M18.5,9.5l-1.1,1.1c0.5,0.5,0.8,1.2,0.8,1.9s-0.3,1.4-0.8,1.9l1.1,1.1c0.8-0.8,1.3-1.8,1.3-3S19.3,10.3,18.5,9.5z" />
+                                <path class="wave-outer"
+                                    d="M20.5,8.5l-1.1,1.1c0.8,0.8,1.3,1.9,1.3,3.1s-0.5,2.3-1.3,3.1l1.1,1.1c1.1-1.1,1.8-2.6,1.8-4.2S21.6,9.6,20.5,8.5z" />
+                            </g>
+                        </svg>
+                    </div>
+                </button>
+            </td>
+            <td> 
+                <div class="showItems" >
+                    <button class="bt-round" onclick="togglePower()" id="powerBtn">
+                        <div class="bt-inner">
+                            <div class="power-rim">
+                                <div class="power-core">
+                                    <svg class="power-icon" viewBox="0 0 24 24">
+                                        <path
+                                            d="M13,3h-2v10h2V3z M17.83,5.17l-1.42,1.42C17.99,7.86,19,9.81,19,12c0,3.87-3.13,7-7,7s-7-3.13-7-7 c0-2.19,1.01-4.14,2.58-5.42L6.17,5.17C4.23,6.82,3,9.26,3,12c0,4.97,4.03,9,9,9s9-4.03,9-9C21,9.26,19.77,6.82,17.83,5.17z" />
+                                    </svg>
+                                </div>
+                            </div>
+                    </button>
+                </div>
+            </td>
+            <td>
+                <div class="showItems">
+                    <button class="bt-round" onclick="increaseIntensity()" id="intensityButton">
+                        <div class="bt-inner">
+                            <div class="btn-rim">
+                                <div class="btn-core">
+                                    <!-- Green Triangle Icon -->
+                                    <svg class="triangle-icon" viewBox="0 0 100 100">
+                                        <path d="M50 15 L90 85 L10 85 Z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                </div>              
+            </td>
+        </tr>
+        <tr>
+            <td>
+                
+    
+            </td>
+            <td>  
+                <div  class="showItems connect" id="wifi_on" onclick="sendCommand('WIFI_ON')">
+                    <!-- Initially hidden, shown after connection -->
+    
+                    <button class="bt-round" id="wifiButton" title="WiFi Status" aria-label="WiFi Status"
+                        style="display: flex;" hover="Toggle wifi ON/OFF">
+                        <div class="bt-inner">
+                            <!-- WiFi Icon Path -->
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z" />
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </td>
+            <td > 
+              
+            </td>
+        </tr>
+    </table>
+    
+    
+ <!-- <button class="action" onclick="sendCommand('START')">Power ON</button>
+    <button class="action" onclick="sendCommand('CHANGE_LEVEL')">Change Level</button>
+    <button class="action" onclick="sendCommand('STOP')">Turn OFF</button> -->
   
-   
     </div> 
      
 
     <script>
          let charac;
+         let batCharacteristic;
+         let isPowerOn = false;
 
         async function connectBLE() {
+            document.getElementById('bleConnect').classList.remove('wave-inner'); // Reset state before trying to connect
             try {
                 const device = await navigator.bluetooth.requestDevice({
                     filters: [{ name: 'xuv-scent' }],
-                    optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b']
+                    optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b', 'battery_service', 'device_information']
                 });
 
-                const server = await device.gatt.connect();
+                const server = await device.gatt.connect();                   
+
+                const bleBtn = document.getElementById('bleConnect');
+                const wifiBtn = document.getElementById('wifiButton');                 
+
+                // Apply the radial gradient to the inner element (preserves metallic rim)
+                const inner = bleBtn.querySelector('.bt-inner');
+                const wifiInner = wifiBtn.querySelector('.bt-inner');
+                
+
+                const gradient = "radial-gradient(circle at 30% 30%, #4facfe 0%, #0082fc 100%)";
+                if (inner) {
+                    inner.style.background = gradient; // Change to a connected state color
+                } else {
+                    bleBtn.style.background = gradient;
+                }
+                
+                if (wifiInner) {
+                    wifiInner.style.background = gradient; // Change to a connected state color
+                } else {
+                    wifiBtn.style.background = gradient;
+                }
+                // --- 1. SETUP MIST CONTROL ---
                 const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+                // Fixed: Removed stray 'c' and added 'const'
                 charac = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
+                
+                // --- 2. SETUP BATTERY SERVICE ---
+                const batService = await server.getPrimaryService('battery_service');
+                batCharacteristic = await batService.getCharacteristic('battery_level');
 
-                // 1. Show action buttons
-                document.querySelectorAll('.action').forEach(b => b.style.display = 'block');
-                document.querySelector('#wifiButton').style.display = 'flex'; // Show the button container
-                // document.querySelector('#bleConnect').style.display = 'none';
+                // Read Initial Battery Value
+                const batValue = await batCharacteristic.readValue();
+                const initialBattery = batValue.getUint8(0);
+                document.getElementById('percentageText').innerText = `${initialBattery}%`;
 
-                // 2. Setup Notifications
+                // Enable Battery Auto-Updates (Notifications)
+                await batCharacteristic.startNotifications();
+                batCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+                    const level = 21;
+                    // event.target.value.getUint8(0);
+                    document.getElementById('percentageText').innerText = `${level}%`;
+                    updateBatteryFill(21); // For testing, you can replace 'level' with a static value like 50
+                    console.log("Battery Level Updated:", level);
+                });
+
+                // --- 3. UI UPDATES ---
+                document.querySelectorAll('.showItems').forEach(b => b.style.display = 'block'); 
+
+                // --- 4. SETUP MIST NOTIFICATIONS ---
                 await charac.startNotifications();
                 charac.addEventListener('characteristicvaluechanged', (event) => {
-                    const value = new TextDecoder().decode(event.target.value);
-                    updateButtonUI(value);
+                    const val = new TextDecoder().decode(event.target.value);
+                    updateButtonUI(val);
+                    // refreshBattery(); // Refresh battery level on mist state change (optional)
                 });
 
-                // 3. READ INITIAL STATE (Optional but recommended)
-                // This ensures the buttons color correctly immediately on connect
-                const initialValue = await charac.readValue();
-                updateButtonUI(new TextDecoder().decode(initialValue));
+                // --- 5. DISCONNECTION LOGIC ---
+                device.addEventListener('gattserverdisconnected', () => {
+                    console.log("Mist Device Disconnected");
+                    // Add UI reset logic here if needed
+                });
+
+                // // Read initial mist state
+                // const initialMistValue = await charac.readValue();
+                // updateButtonUI(new TextDecoder().decode(initialMistValue));
 
             } catch (error) {
+                // This will now print the EXACT error (e.g., "Service not found")
+                document.getElementById('bleConnect').classList.remove('connected');
                 console.log("Bluetooth Connection Failed:", error);
             }
         }
-
-        async function sendCommand(cmd) {
-            if (charac) {
+ 
+        // Function to manually "Ask" the ESP32 for the battery level
+            async function refreshBattery() {
                 try {
-                    await charac.writeValue(new TextEncoder().encode(cmd));
-                } catch (error) {
-                    console.log("Send Command Failed:", error);
-                }
-            }
-        }
-        
-        async function updateHardwareStatus() {
-                try {
-                     const res = await fetch('http://192.168.1.12/batteryLevel');
-                    const data = await response.json(); // Map from C++: { "level": 15, "voltage": 3.4 }
-                    // const response = {"level": Math.floor(Math.random() * 100) + 1};
-                    // await fetch('/batLevel');
-                    console.log("Received data from hardware:", response);
-                    // const data =  response; // Data is the map from C++
-
-                    // Extract 'level' from your map and update the blue bar
-                    const bar = document.getElementById('percentageText');
-                    if (data.level !== undefined) {
-                    bar.innerText = data.level + "%";
+                    if (!batCharacteristic) {
+                        console.log("Not connected to Battery Service yet!");
+                        return;
                     }
-                } catch (err) {
-                    console.error("Connection lost to hardware", err);
+                    var value = 21;
+                    // await batCharacteristic.readValue(); // This makes the "Call"
+                    const level = Math.max(0, Math.min(100, value)); // Ensure level is between 0-100
+                    document.getElementById('percentageText').innerText = `${level}%`; 
+                        updateBatteryFill(level); // Update the fill based on the new level
+                    console.log("Polled Battery Level:", level);
+                } catch (e) {
+                    console.log("Polling failed", e);
                 }
-                }
-// Update UI every 5 seconds
-setInterval(updateHardwareStatus, 5000);
+            } 
+        
+        setInterval(refreshBattery, 3000);    
 
         function updateButtonUI(status) {
             const wifi_on = document.getElementById('wifi_on');
@@ -233,72 +492,89 @@ setInterval(updateHardwareStatus, 5000);
                 wifi_off.style.background = "linear-gradient(145deg, #d32f2f, #b71c1c)"; // Red
             }
         }          
-          function loadNetworks() {
-                fetch('/batteryLevel').then(response => response.json()).then(networks => {
-                     
-                });
+        function loadNetworks() {
+            fetch('/batteryLevel').then(response => response.json()).then(networks => {
+                    
+            });
+        }
+        function updateBatteryFill(level) {
+            const fillElement = document.getElementById('batteryFill');
+            const textElement = document.getElementById('percentageText');
+            // 1. Constrain level between 0 and 100
+            const cleanLevel = Math.max(0, Math.min(100, level));
+            // 2. Update the Background Gradient
+            // We use the same percentage for both to create a sharp "liquid" line
+            // Blue starts at the bottom and fills "up" to the level
+            fillElement.style.background = `linear-gradient(to top, #0082fc ${cleanLevel}%, #7c7e80 ${cleanLevel}%)`;
+            // 3. Update the text
+            textElement.innerText = `${Math.round(cleanLevel)}%`;            
+            // Optional: Change color to Red if battery is low (< 20%)
+            if (cleanLevel < 20) {
+                fillElement.style.background = `linear-gradient(to top, #ff4b2b ${cleanLevel}%, #7c7e80 ${cleanLevel}%)`;
             }
- 
+        }
+        async function increaseIntensity() {
+            if (!charac) return; // Ensure BLE is connected
+
+            try {
+                // 1. Send the command to ESP32
+                const encoder = new TextEncoder();
+                await charac.writeValue(encoder.encode("CHANGE_LEVEL"));
+
+                // 2. Trigger the Triangle Animation
+                const icon = document.querySelector('.triangle-icon');
+                icon.classList.remove('intensity-pulse'); // Reset animation
+                void icon.offsetWidth; // Trigger reflow to restart animation
+                icon.classList.add('intensity-pulse');
+
+                console.log("Intensity increased!");
+            } catch (error) {
+                console.error("Failed to change intensity:", error);
+            }
+        }
+
+        async function togglePower() {
+            if (!charac) return; // Ensure BLE is connected
+
+            isPowerOn = !isPowerOn;
+            const btn = document.getElementById('powerBtn');
+            const command = isPowerOn ? "START" : "STOP";
+
+            try {
+                // Send command to ESP32
+                const encoder = new TextEncoder();
+                await charac.writeValue(encoder.encode(command));
+
+                // Toggle UI
+                if (isPowerOn) {
+                   
+                // Apply the radial gradient to the inner element (preserves metallic rim)
+                const inner = btn.querySelector('.bt-inner');                 
+
+                const gradient = "radial-gradient(circle at 30% 30%, #4facfe 0%, #0082fc 100%)";
+                if (inner) {
+                    inner.style.background = gradient; // Change to a connected state color
+                } else {
+                    btn.style.background = gradient;
+                }
+                } else {
+                    btn.classList.remove('on');
+                }
+            } catch (error) {
+                console.error("BLE Power Command Failed:", error);
+                isPowerOn = !isPowerOn; // Revert state on fail
+            }
+        }
+         async function sendCommand(cmd) {
+            if (charac) {
+                try {
+                    await charac.writeValue(new TextEncoder().encode(cmd));
+                } catch (error) {
+                    console.log("Send Command Failed:", error);
+                }
+            }
+        }
     </script>
-    
-
-
-
-<div style="display: flex;">
-    <button class="bt-round" id="batteryButton">
-        <!-- We will target 'batteryFill' for the color and 'percentageText' for the number -->
-        <div class="bt-inner battery-fill" id="batteryFill" style="background: linear-gradient(to top, #0082fc 0%, #1a1a1a 0%);">
-            <div class="percentage">
-                <span id="percentageText">1%</span>
-                <svg viewBox="0 0 24 24" style="width: 40px; height: 25px;">
-                    <path d="M16,20H8V6H16M16.67,4H15V2H9V4H7.33A0.67,0.67 0 0,0 6.67,4.67V21.33A0.67,0.67 0 0,0 7.33,22H16.67A0.67,0.67 0 0,0 17.33,21.33V4.67A0.67,0.67 0 0,0 16.67,4Z" transform="rotate(90 12 12)""")/>>
-                </svg>
-            </div>
-        </div>
-    </button>    
-</div>
-
-
-
-
-
-
-
-
-
-
-<style>
-    
-      /* Style for the 'Water Level' fill effect */
-.battery-fill {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    transition: background 0.5s ease; /* Smooth transition when level changes */
-}
-
-/* Ensure the gloss/shine overlay from your bt-inner still works */
-.battery-fill::after {
-    z-index: 2;
-}
-
-.percentage {
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
-    font-weight: bold;
-    font-family: 'Segoe UI', sans-serif;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-}
-
-.percentage svg {
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
-}
-
-</style>
-                 
+           
 </body>
 </html>
