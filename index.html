@@ -13,8 +13,9 @@
             .flex-center {
                 display: flex;
                 justify-content: center;
+                flex-direction: column ;
                 align-items: center;
-                gap: 10px;
+                gap: 6px;
             }
 
             /* 2. Outer Button Rim (Metallic Effect) */
@@ -257,15 +258,54 @@
                 justify-content: center;
                 align-items: center;
             }
+            .status-row {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 10px 0;
+                font-family: sans-serif;
+            }
+
+            .led {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                margin-right: 10px;
+                background-color: #444; /* Default Gray (Off) */
+                box-shadow: inset 0 0 3px rgba(0,0,0,0.5);
+                transition: all 0.3s ease;
+            }
+
+            /* Green LED (On) */
+            .led-on {
+                background-color: #2ecc71;
+                box-shadow: 0 0 8px #2ecc71, inset 0 0 3px rgba(0,0,0,0.2);
+            }
+
+            /* Red LED (Error/Off) */
+            .led-off {
+                background-color: #e74c3c;
+                box-shadow: 0 0 8px #e74c3c, inset 0 0 3px rgba(0,0,0,0.2);
+            }
     </style>
 </head>
 <body onload="loadContainer()">
     <h2>XUV IOT Setup</h2>
     <div class="flex-center">
-        
+         
+    
+    
+    
     <table style="border: 5px;border-color: #675e45;border-style: solid;border-radius: 20px;background-color: #444242;">
         <tr>
-            <td>  </td>
+            <td>
+                <div class="showItems"> 
+                <div class="status-row">
+                    <div id="wifi-led" class="led"></div><br/>
+                    <span style="font-size: 8px;">Wi-Fi: <b id="wifi-txt">...</b></span>
+                </div>
+                </div>
+            </td>
             <td style="padding-bottom: 5px;">  
                 <div class="showItems">
                     <button class="bt-round" id="batteryButton">
@@ -279,7 +319,14 @@
                     </button>
                 </div>
             </td>
-            <td>   </td>
+            <td>  
+                <div class="showItems"> 
+                <div class="status-row">
+                    <div id="sinric-led" class="led"></div><br/>
+                    <span style="font-size: 8px;">Cloud: <b id="sinric-txt">...</b></span>
+                </div>
+                </div>
+            </td>
         </tr>
         <tr>
             <td style="padding-right: 5px;">
@@ -443,17 +490,26 @@
                     const val = new TextDecoder().decode(event.target.value);
                     console.log("Mist State Changed:", val);
                     updateButtonUI(val);
-                    refreshBattery(); // Refresh battery level on mist state change (optional)
+                    // refreshBattery(); // Refresh battery level on mist state change (optional) 
                 });
 
                 // Enable Battery Auto-Updates (Notifications)
                 await batCharacteristic.startNotifications();
                 batCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
-                    // console.log("batCharacteristic value changed:", event.target.value);                      
-                    const level = event.target.value.getUint8(0);
-                    document.getElementById('percentageText').innerText = `${level}%`;
-                    updateBatteryFill(level); // Update battery fill with the actual level
-                    console.log("Battery Level Updated:", level);
+                    // console.log("batCharacteristic value changed:", event.target.value);
+                    const val = new TextDecoder().decode(event.target.value);   
+                    try {
+                         console.log("batCharacteristic value changed:", val);
+                        const data = JSON.parse(val);
+                            // const level = event.target.value.getUint8(0);
+                        document.getElementById('percentageText').innerText = `${data.batteryPct}%`;
+                        updateBatteryFill(data.batteryPct); // Update battery fill with the actual level
+                        console.log("Battery Level Updated:", data.batteryPct);
+                        updateStatus(data); // Update status indicators based on new battery data
+                    } catch (e) {
+                        console.log("Battery Notification Data:", val); // Log raw value if not JSON
+                    }                   
+                    
                 });
 
                 // --- 3. UI UPDATES ---
@@ -477,33 +533,51 @@
                     console.log("Polled Battery Level:", value.getUint8(0)); 
                     const level = Math.max(0, Math.min(100, value.getUint8(0))); // Ensure level is between 0-100
                     document.getElementById('percentageText').innerText = `${level}%`; 
-                        updateBatteryFill(level); // Update the fill based on the new level
+                    updateBatteryFill(level); // Update the fill based on the new level 
+                    // readWifiStats();
                     
                 } catch (e) {
                     console.log("Polling failed", e);
                 }
             } 
         
-        // setInterval(refreshBattery, 18000);    
+         setInterval(refreshBattery, 3000);    
+
+        //  async function readWifiStats() {
+        //     if (!charac) return;
+        //     try {
+        //     // Read Initial Battery Value
+        //         const response = await charac.readValue();
+        //         const readValue = response.getUint8(0);
+        //         console.log("Initial Level on readWifiStats:", readValue);
+        //     } catch (e) {
+        //         console.log("Read wifi stats error:", e);
+        //     }
+        //  }
+        
+        //  setInterval(readWifiStats, 3000); 
 
         function updateButtonUI(status) {
             console.log("Updating Button UI with status:", status);
             const wifiBtn = document.getElementById('wifiButton');            
             // Note: Ensure your ESP32/BLE device sends exactly "ON" or "OFF"
-            if(wifiBtn.querySelector('.bt-inner') && (status.trim() === "WIFI_IS_ON" || status.trim() === "WIFI_ON_WRITE_WIFI_ON")) {
-                 wifiOn = true;
-                 wifiBtn.querySelector('.bt-inner').style.background = gradient; // Change WiFi button inner to match connected state
-                 
-            } else { 
-                   wifiOn = false;
-                   wifiBtn.querySelector('.bt-inner').style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)"; // Revert to default if WiFi is off                  
+            try {
+                // const data = JSON.parse(status);
+
+                if(wifiBtn.querySelector('.bt-inner') && (status.trim() === "WIFI_IS_ON" || status.trim() === "WIFI_ON_WRITE_WIFI_ON")) {
+                    wifiOn = true;
+                    wifiBtn.querySelector('.bt-inner').style.background = gradient; // Change WiFi button inner to match connected state                 
+                } else { 
+                    wifiOn = false;
+                    wifiBtn.querySelector('.bt-inner').style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)"; // Revert to default if WiFi is off                  
+                }
+                updateStatus(data); // Update the status indicators based on the new data                 
+            } catch (e) {
+                console.log("Error accessing WiFi button elements:", e);
             }
+           
         }          
-        function loadNetworks() {
-            fetch('/batteryLevel').then(response => response.json()).then(networks => {
-                    
-            });
-        }
+        
         function updateBatteryFill(level) {
             const fillElement = document.getElementById('batteryFill');
             const textElement = document.getElementById('percentageText');
@@ -578,6 +652,28 @@
                 } catch (error) {
                     console.log("Send Command Failed:", error);
                 }
+            }
+        }
+        function updateStatus(data) {
+            const wifiLed = document.getElementById('wifi-led');
+            const sinricLed = document.getElementById('sinric-led');
+
+            // Update Wi-Fi LED
+            if (data.wifi === "WIFI_IS_ON") {
+                wifiLed.className = "led led-on";
+                document.getElementById('wifi-txt').innerText = "Active";
+            } else {
+                wifiLed.className = "led led-off";
+                document.getElementById('wifi-txt').innerText = "Offline";
+            }
+
+            // Update Sinric LED
+            if (data.sinric === "SINRIC_ON") {
+                sinricLed.className = "led led-on";
+                document.getElementById('sinric-txt').innerText = "Active";
+            } else {
+                sinricLed.className = "led led-off";
+                document.getElementById('sinric-txt').innerText = "Offline";
             }
         }
     </script>
