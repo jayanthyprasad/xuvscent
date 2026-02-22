@@ -19,8 +19,8 @@
 
             /* 2. Outer Button Rim (Metallic Effect) */
             .bt-round {
-                width: 100px;
-                height: 100px;
+                width: 80px;
+                height: 80px;
                 border-radius: 50%;
                 border: none;
                 cursor: pointer;
@@ -73,18 +73,20 @@
                 z-index: 1;
                 filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
             }
-            .waves {
+            .bt-waves {
                 animation: pulse 1.5s infinite;
                 transform-origin: center;
             }  
             .wave-inner {
                 animation: pulse 1.5s infinite;
                 opacity: 0.3;
+                display: none;
             }          
             .wave-outer {
                 animation: pulse 1.5s infinite;
                 animation-delay: 0.3s; /* The outer wave pulses slightly after the inner one */
                 opacity: 0.1;
+                display: none;
             }
 
             @keyframes pulse {
@@ -211,7 +213,7 @@
                 height: 100%;
                 border-radius: 50%;
                 /* background: linear-gradient(145deg, #e6e6e6, #999999); */
-                box-shadow: inset 0 0 10px #000, 0 0 15px rgba(57, 255, 20, 0.4);
+                /* box-shadow: inset 0 0 10px #000, 0 0 15px rgba(57, 255, 20, 0.4); */
                 padding: 6px;
                 display: flex;
                 align-items: center;
@@ -257,14 +259,14 @@
             }
     </style>
 </head>
-<body>
+<body onload="loadContainer()">
     <h2>XUV IOT Setup</h2>
     <div class="flex-center">
         
-    <table>
+    <table style="border: 5px;border-color: #675e45;border-style: solid;border-radius: 20px;background-color: #444242;">
         <tr>
             <td>  </td>
-            <td>  
+            <td style="padding-bottom: 5px;">  
                 <div class="showItems">
                     <button class="bt-round" id="batteryButton">
                         <!-- We will target 'batteryFill' for the color and 'percentageText' for the number -->
@@ -280,7 +282,7 @@
             <td>   </td>
         </tr>
         <tr>
-            <td>
+            <td style="padding-right: 5px;">
                 <button class="bt-round" onclick="connectBLE()" title="Connect to Bluetooth Device" id="bleConnect"
                     aria-label="Connect to Bluetooth Device" hover="Connect to Bluetooth Device">
                     <div class="bt-inner">
@@ -289,7 +291,7 @@
                             <path
                                 d="M17.71,7.71L12,2h-1v7.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z" />
                             <!-- Corrected Signal Waves (Positioned on the sides) -->
-                            <g class="waves">
+                            <g class="bt-waves">
                                 <!-- Left Waves (Outer & Inner) -->
                                 <path class="wave-outer"
                                     d="M3.5,8.5c-1.1,1.1-1.8,2.6-1.8,4.2s0.7,3.1,1.8,4.2l1.1-1.1c-0.8-0.8-1.3-1.9-1.3-3.1s0.5-2.3,1.3-3.1L3.5,8.5z" />
@@ -311,22 +313,27 @@
                     <button class="bt-round" onclick="togglePower()" id="powerBtn">
                         <div class="bt-inner">
                             <div class="power-rim">
-                                <div class="power-core">
+                                <div class="power-core" style="flex-direction: column;">
+                                    <svg style="width: 12px; height: 12px; background-color: transparent;" viewBox="0 0 24 24">
+                                        <path d="M17.71,7.71L12,2h-1v7.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z" />
+                                    </svg> 
                                     <svg class="power-icon" viewBox="0 0 24 24">
-                                        <path
-                                            d="M13,3h-2v10h2V3z M17.83,5.17l-1.42,1.42C17.99,7.86,19,9.81,19,12c0,3.87-3.13,7-7,7s-7-3.13-7-7 c0-2.19,1.01-4.14,2.58-5.42L6.17,5.17C4.23,6.82,3,9.26,3,12c0,4.97,4.03,9,9,9s9-4.03,9-9C21,9.26,19.77,6.82,17.83,5.17z" />
+                                        <path d="M13,3h-2v10h2V3z M17.83,5.17l-1.42,1.42C17.99,7.86,19,9.81,19,12c0,3.87-3.13,7-7,7s-7-3.13-7-7 c0-2.19,1.01-4.14,2.58-5.42L6.17,5.17C4.23,6.82,3,9.26,3,12c0,4.97,4.03,9,9,9s9-4.03,9-9C21,9.26,19.77,6.82,17.83,5.17z" />
                                     </svg>
                                 </div>
                             </div>
                     </button>
                 </div>
             </td>
-            <td>
+            <td style="padding-left: 5px;">
                 <div class="showItems">
                     <button class="bt-round" onclick="increaseIntensity()" id="intensityButton">
                         <div class="bt-inner">
                             <div class="btn-rim">
-                                <div class="btn-core">
+                                <div class="btn-core" style="flex-direction: column;">
+                                    <svg style="width: 12px; height: 12px; background-color: transparent;" viewBox="0 0 24 24">
+                                        <path d="M17.71,7.71L12,2h-1v7.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z" />
+                                    </svg> 
                                     <!-- Green Triangle Icon -->
                                     <svg class="triangle-icon" viewBox="0 0 100 100">
                                         <path d="M50 15 L90 85 L10 85 Z" />
@@ -344,16 +351,12 @@
     
             </td>
             <td>  
-                <div  class="showItems connect" id="wifi_on" onclick="sendCommand('WIFI_ON')">
-                    <!-- Initially hidden, shown after connection -->
-    
-                    <button class="bt-round" id="wifiButton" title="WiFi Status" aria-label="WiFi Status"
-                        style="display: flex;" hover="Toggle wifi ON/OFF">
-                        <div class="bt-inner">
+                <div  class="showItems" id="wifiToggle" onclick="sendCommand(this)">     
+                    <button class="bt-round" id="wifiButton" title="WiFi Status" aria-label="WiFi Status" style="display: flex;" hover="Toggle wifi ON/OFF">                        
+                        <div class="bt-inner">                            
                             <!-- WiFi Icon Path -->
                             <svg viewBox="0 0 24 24">
-                                <path
-                                    d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z" />
+                                <path d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z" />
                             </svg>
                         </div>
                     </button>
@@ -365,19 +368,24 @@
         </tr>
     </table>
     
-    
- <!-- <button class="action" onclick="sendCommand('START')">Power ON</button>
-    <button class="action" onclick="sendCommand('CHANGE_LEVEL')">Change Level</button>
-    <button class="action" onclick="sendCommand('STOP')">Turn OFF</button> -->
-  
-    </div> 
-     
+   </div>   
 
     <script>
          let charac;
          let batCharacteristic;
          let isPowerOn = false;
+         let wifiOn = false;
+         const gradient = "radial-gradient(circle at 30% 30%, #4facfe 0%, #0082fc 100%)";
+        loadContainer = () => {
+                    // Hide only the OUTER waves
+                    document.querySelectorAll('.wave-outer').forEach(el => el.style.display = 'none'); 
+                    document.querySelectorAll('.wave-inner').forEach(el => el.style.display = 'none');
+                    document.getElementById('bleConnect').querySelector('.bt-inner').style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)";
+                    document.getElementById('powerBtn').querySelector('.bt-inner').style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)";
+                    document.getElementById('intensityButton').querySelector('.bt-inner').style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)";
+                     document.querySelectorAll('.showItems').forEach(b => b.style.display = 'none');
 
+        }
         async function connectBLE() {
             document.getElementById('bleConnect').classList.remove('wave-inner'); // Reset state before trying to connect
             try {
@@ -387,32 +395,39 @@
                 });
 
                 const server = await device.gatt.connect();                   
-
+                
                 const bleBtn = document.getElementById('bleConnect');
-                const wifiBtn = document.getElementById('wifiButton');                 
+                    
+                
+                // Hide only the OUTER waves
+                    document.querySelectorAll('.wave-outer').forEach(el => el.style.display = 'block');
+
+                    // Show only the INNER waves
+                    document.querySelectorAll('.wave-inner').forEach(el => el.style.display = 'block');
 
                 // Apply the radial gradient to the inner element (preserves metallic rim)
                 const inner = bleBtn.querySelector('.bt-inner');
-                const wifiInner = wifiBtn.querySelector('.bt-inner');
                 
-
-                const gradient = "radial-gradient(circle at 30% 30%, #4facfe 0%, #0082fc 100%)";
                 if (inner) {
                     inner.style.background = gradient; // Change to a connected state color
+                    
                 } else {
                     bleBtn.style.background = gradient;
                 }
+                // --- 5. DISCONNECTION LOGIC ---
+                device.addEventListener('gattserverdisconnected', (event) => {
+                    console.log("gattserverdisconnected value changed:", event.target.value);
+                    console.log("Mist Device Disconnected");
+                    loadContainer();
+                    // Add UI reset logic here if needed
+                });
+
                 
-                if (wifiInner) {
-                    wifiInner.style.background = gradient; // Change to a connected state color
-                } else {
-                    wifiBtn.style.background = gradient;
-                }
                 // --- 1. SETUP MIST CONTROL ---
                 const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
                 // Fixed: Removed stray 'c' and added 'const'
                 charac = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
-                
+
                 // --- 2. SETUP BATTERY SERVICE ---
                 const batService = await server.getPrimaryService('battery_service');
                 batCharacteristic = await batService.getCharacteristic('battery_level');
@@ -421,37 +436,28 @@
                 const batValue = await batCharacteristic.readValue();
                 const initialBattery = batValue.getUint8(0);
                 document.getElementById('percentageText').innerText = `${initialBattery}%`;
-
-                // Enable Battery Auto-Updates (Notifications)
-                await batCharacteristic.startNotifications();
-                batCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
-                    const level = 21;
-                    // event.target.value.getUint8(0);
-                    document.getElementById('percentageText').innerText = `${level}%`;
-                    updateBatteryFill(21); // For testing, you can replace 'level' with a static value like 50
-                    console.log("Battery Level Updated:", level);
-                });
-
-                // --- 3. UI UPDATES ---
-                document.querySelectorAll('.showItems').forEach(b => b.style.display = 'block'); 
-
+                
                 // --- 4. SETUP MIST NOTIFICATIONS ---
                 await charac.startNotifications();
                 charac.addEventListener('characteristicvaluechanged', (event) => {
                     const val = new TextDecoder().decode(event.target.value);
+                    console.log("Mist State Changed:", val);
                     updateButtonUI(val);
-                    // refreshBattery(); // Refresh battery level on mist state change (optional)
+                    refreshBattery(); // Refresh battery level on mist state change (optional)
                 });
 
-                // --- 5. DISCONNECTION LOGIC ---
-                device.addEventListener('gattserverdisconnected', () => {
-                    console.log("Mist Device Disconnected");
-                    // Add UI reset logic here if needed
+                // Enable Battery Auto-Updates (Notifications)
+                await batCharacteristic.startNotifications();
+                batCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+                    // console.log("batCharacteristic value changed:", event.target.value);                      
+                    const level = event.target.value.getUint8(0);
+                    document.getElementById('percentageText').innerText = `${level}%`;
+                    updateBatteryFill(level); // Update battery fill with the actual level
+                    console.log("Battery Level Updated:", level);
                 });
 
-                // // Read initial mist state
-                // const initialMistValue = await charac.readValue();
-                // updateButtonUI(new TextDecoder().decode(initialMistValue));
+                // --- 3. UI UPDATES ---
+                document.querySelectorAll('.showItems').forEach(b => b.style.display = 'block');      
 
             } catch (error) {
                 // This will now print the EXACT error (e.g., "Service not found")
@@ -467,29 +473,30 @@
                         console.log("Not connected to Battery Service yet!");
                         return;
                     }
-                    var value = 21;
-                    // await batCharacteristic.readValue(); // This makes the "Call"
-                    const level = Math.max(0, Math.min(100, value)); // Ensure level is between 0-100
+                    var value = await batCharacteristic.readValue(); // This makes the "Call"
+                    console.log("Polled Battery Level:", value.getUint8(0)); 
+                    const level = Math.max(0, Math.min(100, value.getUint8(0))); // Ensure level is between 0-100
                     document.getElementById('percentageText').innerText = `${level}%`; 
                         updateBatteryFill(level); // Update the fill based on the new level
-                    console.log("Polled Battery Level:", level);
+                    
                 } catch (e) {
                     console.log("Polling failed", e);
                 }
             } 
         
-        setInterval(refreshBattery, 3000);    
+        // setInterval(refreshBattery, 18000);    
 
         function updateButtonUI(status) {
-            const wifi_on = document.getElementById('wifi_on');
-            const wifi_off = document.getElementById('wifi_off');             
+            console.log("Updating Button UI with status:", status);
+            const wifiBtn = document.getElementById('wifiButton');            
             // Note: Ensure your ESP32/BLE device sends exactly "ON" or "OFF"
-            if (status.trim() === "ON") {
-                wifi_on.style.background = "linear-gradient(145deg, #00ff00, #008000)"; // Green
-                wifi_off.style.background = "#555"; // Dimmed
-            } else if (status.trim() === "OFF") {
-                wifi_on.style.background = "#555"; // Dimmed
-                wifi_off.style.background = "linear-gradient(145deg, #d32f2f, #b71c1c)"; // Red
+            if(wifiBtn.querySelector('.bt-inner') && (status.trim() === "WIFI_IS_ON" || status.trim() === "WIFI_ON_WRITE_WIFI_ON")) {
+                 wifiOn = true;
+                 wifiBtn.querySelector('.bt-inner').style.background = gradient; // Change WiFi button inner to match connected state
+                 
+            } else { 
+                   wifiOn = false;
+                   wifiBtn.querySelector('.bt-inner').style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)"; // Revert to default if WiFi is off                  
             }
         }          
         function loadNetworks() {
@@ -515,7 +522,6 @@
         }
         async function increaseIntensity() {
             if (!charac) return; // Ensure BLE is connected
-
             try {
                 // 1. Send the command to ESP32
                 const encoder = new TextEncoder();
@@ -535,30 +541,26 @@
 
         async function togglePower() {
             if (!charac) return; // Ensure BLE is connected
-
             isPowerOn = !isPowerOn;
-            const btn = document.getElementById('powerBtn');
+            const btnPwr = document.getElementById('powerBtn');
+            const btnIncr = document.getElementById('intensityButton');
             const command = isPowerOn ? "START" : "STOP";
-
             try {
                 // Send command to ESP32
                 const encoder = new TextEncoder();
                 await charac.writeValue(encoder.encode(command));
-
+                const inner = btnPwr.querySelector('.bt-inner');      
+                const innerIntc = btnIncr.querySelector('.btn-core');   
                 // Toggle UI
-                if (isPowerOn) {
-                   
-                // Apply the radial gradient to the inner element (preserves metallic rim)
-                const inner = btn.querySelector('.bt-inner');                 
-
-                const gradient = "radial-gradient(circle at 30% 30%, #4facfe 0%, #0082fc 100%)";
-                if (inner) {
-                    inner.style.background = gradient; // Change to a connected state color
+                if (isPowerOn) {   
+                    if (inner) {
+                        inner.style.background = gradient; // Change to a connected state color
+                        innerIntc.style.background = gradient; // Change to a connected state color
+                    } 
                 } else {
-                    btn.style.background = gradient;
-                }
-                } else {
-                    btn.classList.remove('on');
+                    // btnPwr.classList.remove('on');
+                    inner.style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)"; // Revert to default if power is off
+                    innerIntc.style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)" // Revert to default if WiFi is off
                 }
             } catch (error) {
                 console.error("BLE Power Command Failed:", error);
@@ -566,9 +568,13 @@
             }
         }
          async function sendCommand(cmd) {
+            wifiOn? cmd = "WIFI_OFF" : cmd = "WIFI_ON";
             if (charac) {
                 try {
-                    await charac.writeValue(new TextEncoder().encode(cmd));
+                    await charac.writeValue(new TextEncoder().encode(cmd)).then(() => {
+                        console.log(`Command "${cmd}" sent successfully.`);
+                    });
+                    
                 } catch (error) {
                     console.log("Send Command Failed:", error);
                 }
