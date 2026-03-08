@@ -298,6 +298,11 @@
     
     <table style="border: 5px;border-color: #675e45;border-style: solid;border-radius: 20px;background-color: #444242;">
         <tr>
+            <td colspan="3" style="padding: 10px;">
+                <div id="time-container" style="font-size: small;display: none;"> Device time: <span id="device-time"></span>  </div>
+            </td>
+        </tr>
+        <tr>
             <td>
                 <div class="showItems"> 
                 <div class="status-row">
@@ -480,9 +485,9 @@
                 batCharacteristic = await batService.getCharacteristic('battery_level');
 
                 // Read Initial Battery Value
-                const batValue = await batCharacteristic.readValue();
-                const initialBattery = batValue.getUint8(0);
-                document.getElementById('percentageText').innerText = `${initialBattery}%`;
+               // const batValue = await batCharacteristic.readValue();
+                // const initialBattery = batValue.getUint8(0);
+                // document.getElementById('percentageText').innerText = `${initialBattery}%`;
                 
                 // --- 4. SETUP MIST NOTIFICATIONS ---
                 await charac.startNotifications();
@@ -494,23 +499,24 @@
                 });
 
                 // Enable Battery Auto-Updates (Notifications)
-                await batCharacteristic.startNotifications();
-                batCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
-                    // console.log("batCharacteristic value changed:", event.target.value);
-                    const val = new TextDecoder().decode(event.target.value);   
-                    try {
-                         console.log("batCharacteristic value changed:", val);
-                        const data = JSON.parse(val);
-                            // const level = event.target.value.getUint8(0);
-                        document.getElementById('percentageText').innerText = `${data.batteryPct}%`;
-                        updateBatteryFill(data.batteryPct); // Update battery fill with the actual level
-                        console.log("Battery Level Updated:", data.batteryPct);
-                        updateStatus(data); // Update status indicators based on new battery data
-                    } catch (e) {
-                        console.log("Battery Notification Data:", val); // Log raw value if not JSON
-                    }                   
+                // await batCharacteristic.startNotifications();
+                // batCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+                //     console.log("batCharacteristic EventListener:", event.target.value, new Date().toLocaleTimeString());
+                //     decoder = new TextDecoder();
+                //     const val = decoder.decode(event.target.value);   
+                //     try {
+                //         //  console.log("batCharacteristic value changed:", val);
+                //         const data = JSON.parse(val);
+                //             // const level = event.target.value.getUint8(0);
+                //         document.getElementById('percentageText').innerText = `${data.batPercentage}%`;
+                //         updateBatteryFill(data.batPercentage); // Update battery fill with the actual level
+                //         // console.log("Battery Level Updated:", data.batPercentage);
+                //         updateStatus(data); // Update status indicators based on new battery data
+                //     } catch (e) {
+                //         console.log("Battery Notification Data:", e); // Log raw value if not JSON
+                //     }                   
                     
-                });
+                // });
 
                 // --- 3. UI UPDATES ---
                 document.querySelectorAll('.showItems').forEach(b => b.style.display = 'block');      
@@ -524,38 +530,34 @@
  
         // Function to manually "Ask" the ESP32 for the battery level
             async function refreshBattery() {
+                console.log("Manually refreshing battery level...", new Date().toLocaleTimeString());
                 try {
                     if (!batCharacteristic) {
                         console.log("Not connected to Battery Service yet!");
                         return;
                     }
                     var value = await batCharacteristic.readValue(); // This makes the "Call"
-                    console.log("Polled Battery Level:", value.getUint8(0)); 
-                    const level = Math.max(0, Math.min(100, value.getUint8(0))); // Ensure level is between 0-100
-                    document.getElementById('percentageText').innerText = `${level}%`; 
-                    updateBatteryFill(level); // Update the fill based on the new level 
-                    // readWifiStats();
+                    decoder = new TextDecoder();
+                    value = decoder.decode(value); 
+                    value = JSON.parse(value); // Assuming the ESP32 sends a JSON string with battery info                                 
+                    console.log("Device information:", value);
+                    const level = Math.max(0, Math.min(100, value.batPercentage)); // Ensure level is between 0-100
+                    document.getElementById('percentageText').innerText = `${level}%`;  
+                    document.getElementById('device-time').innerText = `${value.cTimeStamp}`;     
+                    document.getElementById('time-container').style.display = 'block'; // Show time container when we have a timestamp             
+                    if(level){
+                        updateBatteryFill(level); // Update the fill based on the new level  
+                        updateStatus(value);
+                    }
                     
+
                 } catch (e) {
                     console.log("Polling failed", e);
+                    window.location.reload();
                 }
             } 
         
-         setInterval(refreshBattery, 3000);    
-
-        //  async function readWifiStats() {
-        //     if (!charac) return;
-        //     try {
-        //     // Read Initial Battery Value
-        //         const response = await charac.readValue();
-        //         const readValue = response.getUint8(0);
-        //         console.log("Initial Level on readWifiStats:", readValue);
-        //     } catch (e) {
-        //         console.log("Read wifi stats error:", e);
-        //     }
-        //  }
-        
-        //  setInterval(readWifiStats, 3000); 
+         setInterval(refreshBattery, 5000);           
 
         function updateButtonUI(status) {
             console.log("Updating Button UI with status:", status);
@@ -571,7 +573,7 @@
                     wifiOn = false;
                     wifiBtn.querySelector('.bt-inner').style.background  = "radial-gradient(circle at 30% 30%, #8e9193 0%, #616264 100%)"; // Revert to default if WiFi is off                  
                 }
-                updateStatus(data); // Update the status indicators based on the new data                 
+                // updateStatus(status); // Update the status indicators based on the new data                 
             } catch (e) {
                 console.log("Error accessing WiFi button elements:", e);
             }
@@ -593,6 +595,33 @@
             if (cleanLevel < 20) {
                 fillElement.style.background = `linear-gradient(to top, #ff4b2b ${cleanLevel}%, #7c7e80 ${cleanLevel}%)`;
             }
+        }
+         function updateStatus(data) {
+            const wifiLed = document.getElementById('wifi-led');
+            const sinricLed = document.getElementById('sinric-led');
+
+            // Update Wi-Fi LED
+            if (data.wifi === "WIFI_IS_ON") {
+                wifiLed.className = "led led-on";
+                document.getElementById('wifi-txt').innerText = "Active";
+                updateButtonUI(data.wifi);
+            } else {
+                wifiLed.className = "led led-off";
+                document.getElementById('wifi-txt').innerText = "Offline"; 
+                updateButtonUI(data.wifi);
+            }
+
+            // Update Sinric LED
+            if (data.sinric === "SINRIC_ON") {
+                sinricLed.className = "led led-on";
+                document.getElementById('sinric-txt').innerText = "Active";
+                // updateButtonUI(data.sinric);
+            } else {
+                sinricLed.className = "led led-off";
+                document.getElementById('sinric-txt').innerText = "Offline";
+                // updateButtonUI(data.sinric);
+            }
+             
         }
         async function increaseIntensity() {
             if (!charac) return; // Ensure BLE is connected
@@ -654,28 +683,21 @@
                 }
             }
         }
-        function updateStatus(data) {
-            const wifiLed = document.getElementById('wifi-led');
-            const sinricLed = document.getElementById('sinric-led');
 
-            // Update Wi-Fi LED
-            if (data.wifi === "WIFI_IS_ON") {
-                wifiLed.className = "led led-on";
-                document.getElementById('wifi-txt').innerText = "Active";
-            } else {
-                wifiLed.className = "led led-off";
-                document.getElementById('wifi-txt').innerText = "Offline";
-            }
-
-            // Update Sinric LED
-            if (data.sinric === "SINRIC_ON") {
-                sinricLed.className = "led led-on";
-                document.getElementById('sinric-txt').innerText = "Active";
-            } else {
-                sinricLed.className = "led led-off";
-                document.getElementById('sinric-txt').innerText = "Offline";
-            }
-        }
+        //  async function readWifiStats() {
+        //     if (!charac) return;
+        //     try {
+        //     // Read Initial Battery Value
+        //         const response = await charac.readValue();
+        //         const readValue = response.getUint8(0);
+        //         console.log("Initial Level on readWifiStats:", readValue);
+        //     } catch (e) {
+        //         console.log("Read wifi stats error:", e);
+        //     }
+        //  }
+        
+        //  setInterval(readWifiStats, 4000); 
+       
     </script>
            
 </body>
